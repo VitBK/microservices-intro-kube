@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: k8s-program
+  name: resources-ms-service
+spec:
+  selector:
+    app: resources-ms
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: k8s-program
+  name: resources-ms-deployment
+  labels:
+    app: resources-ms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: resources-ms
+  template:
+    metadata:
+      labels:
+        app: resources-ms
+    spec:
+      containers:
+        - name: resources-ms
+          image: resources-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SONGS_MS_URL
+              value: "songs-ms-service"
+            - name: SONGS_MS_PORT
+              value: "8080"
+            - name: RESOURCES_DB_URL
+              value: "resources-ms-db-statefulset-0.resources-ms-db-service"
+            - name: RESOURCES_DB_PORT
+              value: "5432"

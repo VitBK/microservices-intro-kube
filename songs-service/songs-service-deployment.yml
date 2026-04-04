@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: k8s-program
+  name: songs-ms-service
+spec:
+  selector:
+    app: songs-ms
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: k8s-program
+  name: songs-ms-deployment
+  labels:
+    app: songs-ms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: songs-ms
+  template:
+    metadata:
+      labels:
+        app: songs-ms
+    spec:
+      containers:
+        - name: songs-ms
+          image: songs-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SONGS_DB_URL
+              value: "songs-ms-db-statefulset-0.songs-ms-db-service"
+            - name: SONGS_DB_PORT
+              value: "5432"
+          volumeMounts:
+            - name: test-persistent-storage
+              mountPath: /app/test-mount
+      volumes:
+        - name: test-persistent-storage
+          persistentVolumeClaim:
+            claimName: songs-service-test-pvc
