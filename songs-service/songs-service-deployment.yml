@@ -35,11 +35,9 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
-          env:
-            - name: SONGS_DB_URL
-              value: "songs-ms-db-statefulset-0.songs-ms-db-service"
-            - name: SONGS_DB_PORT
-              value: "5432"
+          envFrom:
+            - configMapRef:
+                name: songs-ms-config-map
           volumeMounts:
             - name: test-persistent-storage
               mountPath: /app/test-mount

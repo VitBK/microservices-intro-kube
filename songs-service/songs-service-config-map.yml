@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: k8s-program
+  name: songs-ms-config-map
+data:
+  SONGS_DB_URL: "songs-ms-db-statefulset-0.songs-ms-db-service"
+  SONGS_DB_PORT: "5432"
