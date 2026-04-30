@@ -38,6 +38,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: songs-ms-config-map
+            - secretRef:
+                name: songs-ms-secrets
           volumeMounts:
             - name: test-persistent-storage
               mountPath: /app/test-mount
