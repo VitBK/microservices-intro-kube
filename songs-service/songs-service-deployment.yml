@@ -61,7 +61,15 @@ spec:
           volumeMounts:
             - name: test-persistent-storage
               mountPath: /app/test-mount
+            - name: init-script
+              mountPath: /etc/config
       volumes:
         - name: test-persistent-storage
           persistentVolumeClaim:
             claimName: songs-service-test-pvc
+        - name: init-script
+          configMap:
+            name: songs-ms-config-map
+            items:
+              - key: init.sql
+                path: init.sql
