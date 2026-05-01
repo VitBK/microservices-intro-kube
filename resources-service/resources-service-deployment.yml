@@ -35,12 +35,62 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
           env:
             - name: SONGS_MS_URL
-              value: "songs-ms-service"
+              valueFrom:
+                configMapKeyRef:
+                  name: resources-ms-config-map
+                  key: SONGS_MS_URL
             - name: SONGS_MS_PORT
-              value: "8080"
+              valueFrom:
+                configMapKeyRef:
+                  name: resources-ms-config-map
+                  key: SONGS_MS_PORT
             - name: RESOURCES_DB_URL
-              value: "resources-ms-db-statefulset-0.resources-ms-db-service"
+              valueFrom:
+                configMapKeyRef:
+                  name: resources-ms-config-map
+                  key: RESOURCES_DB_URL
             - name: RESOURCES_DB_PORT
-              value: "5432"
+              valueFrom:
+                configMapKeyRef:
+                  name: resources-ms-config-map
+                  key: RESOURCES_DB_PORT
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: resources-ms-secrets
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: resources-ms-secrets
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: init-script
+              mountPath: /etc/config
+      volumes:
+        - name: init-script
+          configMap:
+            name: resources-ms-config-map
+            items:
+              - key: init.sql
+                path: init.sql

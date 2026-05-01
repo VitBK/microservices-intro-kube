@@ -21,6 +21,11 @@ metadata:
     app: songs-ms
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: songs-ms
@@ -31,19 +36,40 @@ spec:
     spec:
       containers:
         - name: songs-ms
-          image: songs-service:latest
+          image: songs-service:0.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
-          env:
-            - name: SONGS_DB_URL
-              value: "songs-ms-db-statefulset-0.songs-ms-db-service"
-            - name: SONGS_DB_PORT
-              value: "5432"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: songs-ms-config-map
+            - secretRef:
+                name: songs-ms-secrets
           volumeMounts:
-            - name: test-persistent-storage
-              mountPath: /app/test-mount
+            - name: init-script
+              mountPath: /etc/config
       volumes:
-        - name: test-persistent-storage
-          persistentVolumeClaim:
-            claimName: songs-service-test-pvc
+        - name: init-script
+          configMap:
+            name: songs-ms-config-map
+            items:
+              - key: init.sql
+                path: init.sql
