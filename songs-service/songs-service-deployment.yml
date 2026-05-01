@@ -59,14 +59,9 @@ spec:
             - secretRef:
                 name: songs-ms-secrets
           volumeMounts:
-            - name: test-persistent-storage
-              mountPath: /app/test-mount
             - name: init-script
               mountPath: /etc/config
       volumes:
-        - name: test-persistent-storage
-          persistentVolumeClaim:
-            claimName: songs-service-test-pvc
         - name: init-script
           configMap:
             name: songs-ms-config-map

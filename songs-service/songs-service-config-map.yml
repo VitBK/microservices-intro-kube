@@ -6,6 +6,7 @@ metadata:
 data:
   SONGS_DB_URL: "songs-ms-db-statefulset-0.songs-ms-db-service"
   SONGS_DB_PORT: "5432"
+  SONGS_MS_PORT: "8080"
   init.sql: |
     CREATE TABLE IF NOT EXISTS songs (
         id SERIAL PRIMARY KEY,
