@@ -3,6 +3,8 @@ kind: Service
 metadata:
   namespace: {{ .Values.namespace }}
   name: resources-ms-service
+  labels:
+    {{- include "resources-service.labels" . | nindent 4 }}
 spec:
   selector:
     app: resources-ms

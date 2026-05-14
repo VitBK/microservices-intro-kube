@@ -4,6 +4,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   name: songs-ms-deployment
   labels:
+    {{- include "songs-service.labels" . | nindent 4 }}
     app: songs-ms
 spec:
   replicas: {{ .Values.replicaCount }}

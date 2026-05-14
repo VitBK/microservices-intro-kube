@@ -4,6 +4,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   name: resources-ms-deployment
   labels:
+    {{- include "resources-service.labels" . | nindent 4 }}
     app: resources-ms
 spec:
   replicas: {{ .Values.replicaCount }}
